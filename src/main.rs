@@ -1,3 +1,4 @@
+use byte_unit::Byte;
 use flate2::write::GzEncoder;
 use flate2::Compression;
 use std::env::args;
@@ -49,6 +50,15 @@ fn main() {
             .write_all(contents.as_bytes())
             .expect("Error: write_all(contents.as_bytes())");
         let compressed_size = encoder.finish().unwrap().len();
-        println!("> {:?} {} {}", p, original_size, compressed_size);
+        println!(
+            "> {:?} {} {}",
+            p,
+            Byte::from_bytes(u128::try_from(original_size).unwrap())
+                .get_appropriate_unit(false)
+                .to_string(),
+            Byte::from_bytes(u128::try_from(compressed_size).unwrap())
+                .get_appropriate_unit(false)
+                .to_string()
+        );
     }
 }

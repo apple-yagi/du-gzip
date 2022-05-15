@@ -7,3 +7,8 @@ edition = "2021"
 
 [dependencies]
 flate2 = "1.0"
+
+[dependencies.byte-unit]
+version = "*"
+default-features = false
+features = ["u128"]
