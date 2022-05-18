@@ -23,6 +23,11 @@ fn main() {
 
     let source = args().nth(1).unwrap();
 
+    if !Path::new(&source).exists() {
+        eprintln!("No such file or directory -- {}", source);
+        return;
+    }
+
     let mut paths: Vec<PathBuf> = Vec::new();
     if Path::new(&source).is_file() {
         paths.push(PathBuf::from(source));
