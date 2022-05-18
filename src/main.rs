@@ -9,6 +9,12 @@ use std::path::PathBuf;
 
 mod dir;
 
+struct Output {
+    path: PathBuf,
+    original_size: String,
+    compressed_size: String,
+}
+
 fn main() {
     if args().len() != 2 {
         eprintln!("Usage: ./compress_file `source`");
@@ -27,6 +33,8 @@ fn main() {
             .collect::<Vec<_>>();
     }
 
+    let mut outputs: Vec<Output> = Vec::new();
+
     for p in paths.iter() {
         if Path::new(p).is_dir() {
             continue;
@@ -44,21 +52,27 @@ fn main() {
             .expect("Failed to read file");
 
         // Gzip encode
-        let output = Vec::new();
-        let mut encoder = GzEncoder::new(output, Compression::default());
+        let v = Vec::new();
+        let mut encoder = GzEncoder::new(v, Compression::default());
         encoder
             .write_all(contents.as_bytes())
             .expect("Error: write_all(contents.as_bytes())");
         let compressed_size = encoder.finish().unwrap().len();
-        println!(
-            "> {:?} {} {}",
-            p,
-            Byte::from_bytes(u128::try_from(original_size).unwrap())
+
+        let output = Output {
+            path: p.to_path_buf(),
+            original_size: Byte::from_bytes(u128::try_from(original_size).unwrap())
                 .get_appropriate_unit(false)
                 .to_string(),
-            Byte::from_bytes(u128::try_from(compressed_size).unwrap())
+            compressed_size: Byte::from_bytes(u128::try_from(compressed_size).unwrap())
                 .get_appropriate_unit(false)
-                .to_string()
-        );
+                .to_string(),
+        };
+
+        outputs.push(output);
+    }
+
+    for o in outputs {
+        println!("{:?} {} {}", o.path, o.original_size, o.compressed_size);
     }
 }
